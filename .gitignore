@@ -1,0 +1,4 @@
+config/logs
+n8n/shared
+.env
+.idea

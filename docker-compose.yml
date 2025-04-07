@@ -1,0 +1,124 @@
+volumes:
+  n8n_storage:
+  postgres_storage:
+  ollama_storage:
+  webui_storage:
+
+x-n8n: &service-n8n
+  image: n8nio/n8n:latest
+  env_file:
+    - .env
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      # HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+      PUID: 1000 # optional, your user id
+      PGID: 1000 # optional, your group id
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config:/app/config
+      #- /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - postgres_storage:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  n8n-import:
+    <<: *service-n8n
+    hostname: n8n-import
+    container_name: n8n-import
+    entrypoint: /bin/sh
+    command:
+      - "-c"
+      - "n8n import:credentials --separate --input=/backup/credentials && n8n import:workflow --separate --input=/backup/workflows"
+    volumes:
+      - ./n8n/backup:/backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  n8n:
+    <<: *service-n8n
+    hostname: n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_storage:/home/node/.n8n
+      - ./n8n/backup:/backup
+      - ./n8n/shared:/data/shared
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n-import:
+        condition: service_completed_successfully
+
+# use local llama instead on MacOS, container does not have GPU support for Metal
+#  ollama:
+#    image: ollama/ollama:latest
+#    ports:
+#      - "11434:11434"
+#    volumes:
+#      - ollama_storage:/root/.ollama
+#    container_name: ollama
+#    pull_policy: always
+#    tty: true
+#    restart: always
+#    environment:
+#      - OLLAMA_KEEP_ALIVE=24h
+#      - OLLAMA_HOST=0.0.0.0
+
+#  ollama-init:
+#    image: ollama/ollama:latest
+#    container_name: ollama-pull-llama
+#    volumes:
+#      - ollama_storage:/root/.ollama
+#    entrypoint: /bin/sh
+#    environment:
+#      - OLLAMA_HOST=host.docker.internal:11434
+#    command:
+#      - "-c"
+#      - "sleep 3; ollama pull llama3.2"
+#    extra_hosts:
+#      - host.docker.internal:host-gateway
+
+  ollama-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-webui
+    volumes:
+      - webui_storage:/app/backend/data
+#    depends_on:
+#      - ollama
+    ports:
+      - "8080:8080"
+    environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models
+      - OLLAMA_BASE_URLS=http://host.docker.internal:11434 #comma separated ollama hosts
+      - ENV=dev
+      - WEBUI_AUTH=False
+#      - WEBUI_NAME=Kickstart AI
+      - WEBUI_URL=http://localhost:8080
+      - WEBUI_SECRET_KEY=t0p-s3cr3t
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped

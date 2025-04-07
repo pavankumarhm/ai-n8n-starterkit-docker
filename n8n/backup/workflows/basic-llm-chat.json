@@ -1,0 +1,89 @@
+{
+  "createdAt": "2025-04-07T21:34:45.070Z",
+  "updatedAt": "2025-04-07T21:34:45.070Z",
+  "id": "basic-llm-chat",
+  "name": "Basic LLM Chat",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3dbb2c12-54d1-43b5-bb57-a4d3fb0b484d",
+      "name": "When chat message received",
+      "webhookId": "da21ee0b-8258-4bc0-8fff-a6c1ac32c5cc"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "30d0f167-bdac-4814-9d71-a8722012a448",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        308,
+        220
+      ],
+      "id": "68d08f2f-2a7b-4133-a1dc-2e28f31399f1",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama",
+          "name": "Ollama (docker)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c9d48fd9-48d9-4e1c-bc34-f4a7ee61aae0",
+  "triggerCount": 0,
+  "tags": []
+}

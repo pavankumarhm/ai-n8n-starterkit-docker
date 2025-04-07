@@ -1,0 +1,38 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Tools:
+    - n8n:
+        icon: n8n.png
+        href: "http://localhost:5678/"
+        description: build workflows, connect everything
+    - open-webui:
+        icon: open-webui.png
+        href: "http://localhost:8080/"
+        description: Ollama Web UI
+
+- APIs:
+    - ollama:
+        icon: ollama.png
+        href: "http://localhost:11434/"
+        description: Ollama API
+        widgets:
+            - type: customapi
+              url: http://host.docker.internal:11434/api/tags
+              method: GET
+              display: dynamic-list
+              mappings:
+                  items: models
+                  name: details.family
+                  label: model
+            - type: customapi
+              url: http://host.docker.internal:11434/api/ps
+              method: GET
+              mappings:
+                  - field: models
+                    label: loaded models
+                    format: size
+                  - field: models.0.size_vram
+                    label: VRAM used
+                    format: bytes
