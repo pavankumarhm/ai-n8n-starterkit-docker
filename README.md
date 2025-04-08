@@ -11,23 +11,71 @@
 
 ## Setup
 
-1. install Docker Desktop
+### Install Docker Desktop
    - [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
    - [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
    - [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/)
 
-2. modify environment variables
+
+### Clone the repository
+   ```bash
+   git clone https://github.com/mashb1t/ai-starterkit-docker.git
+   cd ai-starterkit-docker
+   ```
+
+### Modify environment variables
    - create a `.env` file in the root directory of the project
    - copy the contents of `.env.example` to `.env`
    - modify the values as needed
 
-3. Install ollama
-   * MacOS? See installation of ollama below.
+> [!NOTE]
+> If you have not used your Nvidia GPU with Docker before, please follow the
+> [Ollama Docker instructions](https://github.com/ollama/ollama/blob/main/docs/docker.md).
 
-4. start containers
-   ```bash
-   docker-compose up -d
-   ```
+### For AMD GPU users on Linux
+
+```
+docker compose --profile gpu-amd up -d
+```
+
+#### For Mac / Apple Silicon users
+
+If you’re using a Mac with an M1 or newer processor, you can't expose your GPU
+to the Docker instance, unfortunately. There are two options in this case:
+
+1. Run the starter kit fully on CPU, like in the section "For everyone else"
+   below
+2. Run Ollama on your Mac for faster inference, and connect to that from the
+   n8n instance
+
+If you want to run Ollama on your mac, check the
+[Ollama homepage](https://ollama.com/)
+for installation instructions, and run the starter kit as follows:
+
+```
+docker compose up -d
+```
+
+##### For Mac users running OLLAMA locally
+
+See install instructions below.
+
+```bash
+docker compose up -d
+```
+
+Then run either `ollama serve` or the ollama app to start the server.
+
+#### For everyone else
+
+```
+docker compose --profile cpu up -d
+```
+
+## Open Dashboard
+
+Open your browser and go to [http://localhost:3000](http://localhost:3000) to access the dashboard.
+
 
 ## Update Tools
 
@@ -35,13 +83,10 @@ To update all tools, you can use the following commands:
 
 ```bash
 docker-compose pull
-docker-compose up -d
 ```
 
-## install ollama  (full GPU acceleration support on MacOS)
-Docker does only support CPU acceleration on MacOS (no Metal interface yet for GPU), so if you want to use ollama with GPU acceleration, you need to install it natively.
-
-### Install ollama MacOS app
+## Install Ollama (optional, best for MacOS users)
+### ollama MacOS app
 Download from the [ollama website](https://ollama.com/download)
 
 ### OR Install via homebrew (MacOS only)
@@ -60,7 +105,3 @@ Download from the [ollama website](https://ollama.com/download)
     ```bash
     ollama serve
     ```
-
-## Run
-
-Open your browser and go to [http://localhost:3000](http://localhost:3000) to access the dashboard.
