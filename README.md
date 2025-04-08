@@ -86,7 +86,7 @@ docker-compose pull
 ```
 
 ## Install Ollama (optional, best for MacOS users)
-### ollama MacOS app
+### ollama app
 Download from the [ollama website](https://ollama.com/download)
 
 ### OR Install via homebrew (MacOS only)
@@ -101,7 +101,11 @@ Download from the [ollama website](https://ollama.com/download)
     ```bash
     ollama -v
     ```
-4. start ollama server
+4. pull a LLM, e.g. llama3.2
+    ```bash
+    ollama pull llama3.2
+    ```
+5. start ollama server
     ```bash
     ollama serve
     ```
