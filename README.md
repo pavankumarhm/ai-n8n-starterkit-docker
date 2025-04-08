@@ -101,11 +101,13 @@ Download from the [ollama website](https://ollama.com/download)
     ```bash
     ollama -v
     ```
-4. pull a LLM, e.g. llama3.2
-    ```bash
-    ollama pull llama3.2
-    ```
-5. start ollama server
+
+4. start ollama server
     ```bash
     ollama serve
+    ```
+
+5. pull a LLM, e.g. llama3.2
+    ```bash
+    ollama pull llama3.2
     ```
