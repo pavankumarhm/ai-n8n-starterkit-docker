@@ -109,5 +109,5 @@ Download from the [ollama website](https://ollama.com/download)
 
 5. pull a LLM, e.g. llama3.2
     ```bash
-    ollama pull llama3.2
+    ollama pull llama3.2:3b
     ```
