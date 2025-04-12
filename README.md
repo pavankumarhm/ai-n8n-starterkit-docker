@@ -111,3 +111,15 @@ Download from the [ollama website](https://ollama.com/download)
     ```bash
     ollama pull llama3.2:3b
     ```
+
+## Set up n8n widget
+To display statistics such as workflow count and execution count, you can follow these steps:
+
+1. copy file from copy_me_to_workflows_once/homepage-widget.json to workflows/homepage-widget.json
+2. docker compose up -d
+3. delete file workflows/homepage-widget.json
+4. go to ... > Settings > n8n API, create a new key, copy to clipboard
+5. create new credential "homepage-widget", type: n8n, API Key: value from before, URL: http://127.0.0.1:5678/api/v1
+6. adjust workflow, use credential "homepage-widget", save and set active
+7. uncomment widget in services.yaml
+8. reload localhost:3000

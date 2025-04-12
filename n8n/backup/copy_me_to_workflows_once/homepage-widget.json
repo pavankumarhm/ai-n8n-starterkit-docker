@@ -1,0 +1,239 @@
+{
+  "createdAt": "2025-04-12T16:07:52.179Z",
+  "updatedAt": "2025-04-12T17:00:09.304Z",
+  "id": "homepage-widget",
+  "name": "homepage-widget",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "homepage-widget",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "70939af9-70b8-479a-a055-220dc357f6d2",
+      "name": "Webhook",
+      "webhookId": "d17b18b0-997d-44f8-a632-f2b0faf33e16"
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -180
+      ],
+      "id": "dc84f0ef-4b74-48bd-a43b-aba758dd507d",
+      "name": "n8n",
+      "credentials": {
+        "n8nApi": {
+          "id": "n8n-api-key",
+          "name": "n8n API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "execution",
+        "returnAll": true,
+        "filters": {},
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        220,
+        20
+      ],
+      "id": "8a5638e8-c86f-4043-a4ad-53b69c9de36a",
+      "name": "n8n1",
+      "credentials": {
+        "n8nApi": {
+          "id": "n8n-api-key",
+          "name": "n8n API key"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        660,
+        -80
+      ],
+      "id": "e9f14f80-3c63-4da3-befb-c9f1ca3285b6",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        -80
+      ],
+      "id": "cd155782-5ae0-42aa-a5ff-4957b9a90ec0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {count_workflows: $input.all().length}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        -180
+      ],
+      "id": "d00d9c12-f70e-441c-8904-3acb1982f812",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {count_executions: $input.all().length}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        20
+      ],
+      "id": "d80e5b6d-8dd7-46ac-adb1-9ad7301f99c0",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "count_workflows"
+            },
+            {
+              "aggregation": "sum",
+              "field": "count_executions"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        -80
+      ],
+      "id": "257b38bb-cbf0-446a-b6d4-fdbb7f31b06e",
+      "name": "Summarize"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "n8n",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "n8n1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "086b34f0-54a5-4fe1-9b82-2c656676d9f7",
+  "triggerCount": 1,
+  "tags": []
+}

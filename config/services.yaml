@@ -7,6 +7,17 @@
         icon: n8n.png
         href: "http://localhost:5678/"
         description: build workflows, connect everything
+#        widget:
+#          type: customapi
+#          url: http://host.docker.internal:5678/webhook/homepage-widget
+#          method: GET
+#          mappings:
+#            - field: 0.sum_count_workflows
+#              label: workflows
+#              format: number
+#            - field: 0.sum_count_executions
+#              label: executions
+#              format: number
     - open-webui:
         icon: open-webui.png
         href: "http://localhost:8080/"
@@ -18,21 +29,21 @@
         href: "http://localhost:11434/"
         description: Ollama API
         widgets:
-            - type: customapi
-              url: http://host.docker.internal:11434/api/tags
-              method: GET
-              display: dynamic-list
-              mappings:
-                  items: models
-                  name: details.family
-                  label: model
-            - type: customapi
-              url: http://host.docker.internal:11434/api/ps
-              method: GET
-              mappings:
-                  - field: models
-                    label: loaded models
-                    format: size
-                  - field: models.0.size_vram
-                    label: VRAM used
-                    format: bytes
+          - type: customapi
+            url: http://host.docker.internal:11434/api/tags
+            method: GET
+            display: dynamic-list
+            mappings:
+              items: models
+              name: details.family
+              label: model
+          - type: customapi
+            url: http://host.docker.internal:11434/api/ps
+            method: GET
+            mappings:
+              - field: models
+                label: loaded models
+                format: size
+              - field: models.0.size_vram
+                label: VRAM used
+                format: bytes

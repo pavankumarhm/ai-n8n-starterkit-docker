@@ -46,7 +46,7 @@
       "credentials": {
         "ollamaApi": {
           "id": "ollama",
-          "name": "Ollama (docker)"
+          "name": "Ollama (docker host)"
         }
       }
     }
