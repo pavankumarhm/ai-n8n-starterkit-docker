@@ -1,6 +1,6 @@
 # AI Starterkit (Docker)
 
-![dashboard.jpg](images/dashboard.jpg)
+![dashboard.png](images/dashboard.png)
 
 ## Included Tools
 
