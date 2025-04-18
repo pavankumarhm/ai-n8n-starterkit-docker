@@ -1,3 +1,51 @@
 ---
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/bookmarks
+
+- AI Shortcuts:
+    - ChatGPT:
+        - abbr: GPT
+          href: https://chatgpt.com/
+    - Claude:
+        - abbr: CLA
+          href: https://claude.ai/
+    - Gemini:
+        - abbr: GEM
+          href: https://gemini.google.com/
+    - Ollama Models:
+        - abbr: OLL
+          href: https://ollama.com/search
+    - CivitAI:
+        - abbr: CIV
+          href: https://civitai.com/
+    - HuggingFace:
+        - abbr: HF
+          href: https://huggingface.co/
+
+- Documentation:
+    - ChatGPT Academy:
+        - abbr: GPTA
+          href: https://academy.openai.com/
+    - n8n Docs:
+        - abbr: n8n
+          href: https://docs.n8n.io/
+    - OpenWebUI Docs:
+        - abbr: OI
+          href: https://docs.openwebui.com/
+    - Docker Docs:
+        - abbr: DO
+          href: https://docs.docker.com/
+
+- News / Information:
+    - HuggingFace Papers:
+        - abbr: HF
+          href: https://huggingface.co/papers
+    - The Rundown AI:
+        - abbr: RD
+          href: https://www.therundown.ai/
+    - ByteByteGo:
+        - abbr: BBG
+          href: https://bytebytego.com/
+    - EU AI Act:
+        - abbr: EU
+          href: https://artificialintelligenceact.eu/
