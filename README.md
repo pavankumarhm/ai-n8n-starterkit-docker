@@ -16,7 +16,6 @@
    - [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
    - [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/)
 
-
 ### Clone the repository
    ```bash
    git clone https://github.com/mashb1t/ai-starterkit-docker.git
@@ -29,16 +28,22 @@
    - modify the values as needed
 
 > [!NOTE]
-> If you have not used your Nvidia GPU with Docker before, please follow the
+> If you have not used your GPU with Docker before, please follow the
 > [Ollama Docker instructions](https://github.com/ollama/ollama/blob/main/docs/docker.md).
 
-### For AMD GPU users on Linux
+### For Nvidia GPU users
+
+```
+docker compose --profile gpu-nvidia up -d
+```
+
+### For AMD GPU users
 
 ```
 docker compose --profile gpu-amd up -d
 ```
 
-#### For Mac / Apple Silicon users
+### For Mac / Apple Silicon users
 
 If you’re using a Mac with an M1 or newer processor, you can't expose your GPU
 to the Docker instance, unfortunately. There are two options in this case:
@@ -56,7 +61,7 @@ for installation instructions, and run the starter kit as follows:
 docker compose up -d
 ```
 
-##### For Mac users running OLLAMA locally
+### For Mac users running OLLAMA locally
 
 See install instructions below.
 
@@ -66,7 +71,7 @@ docker compose up -d
 
 Then run either `ollama serve` or the ollama app to start the server.
 
-#### For everyone else
+### For everyone else
 
 ```
 docker compose --profile cpu up -d
