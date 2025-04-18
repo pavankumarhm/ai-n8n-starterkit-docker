@@ -36,6 +36,21 @@ x-init-ollama: &init-ollama
     - "sleep 3; ollama pull llama3.2:3b"
 
 services:
+  # allows displaying the container status in homepage
+  dockerproxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
+    container_name: dockerproxy
+    environment:
+      - CONTAINERS=1 # Allow access to viewing containers
+      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
+      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+      - POST=0 # Disallow any POST operations (effectively read-only)
+    ports:
+      - "127.0.0.1:2375:2375"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
+    restart: unless-stopped
+
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
@@ -62,7 +77,7 @@ services:
     volumes:
       - postgres_storage:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -84,7 +99,7 @@ services:
   n8n:
     <<: *service-n8n
     hostname: n8n
-    container_name: n8n
+    #    container_name: n8n
     restart: unless-stopped
     ports:
       - "5678:5678"
@@ -99,26 +114,54 @@ services:
         condition: service_healthy
       n8n-import:
         condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qS --proxy=off --tries=1 --timeout=3 -O /dev/null http://127.0.0.1:5678/healthz 2>&1 | grep -q 'HTTP/1.1 200 OK'" ]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    labels:
+      - homepage.group=Tools
+      - homepage.name=n8n
+      - homepage.icon=n8n.png
+      - homepage.href=http://localhost:5678/
+      - homepage.description=build workflows, connect everything
+#      - homepage.widget.type=customapi
+#      - homepage.widget.url=http://host.docker.internal:5678/webhook/homepage-widget
+#      - homepage.widget.refreshInterval=120000
+#      - homepage.widget.method=GET
+#      - homepage.widget.mappings[0].label=workflows
+#      - homepage.widget.mappings[0].field=0.sum_count_workflows
+#      - homepage.widget.mappings[0].format=number
+#      - homepage.weight=2
 
-  ollama-webui:
+  open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: ollama-webui
+    container_name: open-webui
     volumes:
       - webui_storage:/app/backend/data
-#    depends_on:
-#      - ollama
+    #    depends_on:
+    #      - ollama
     ports:
       - "8080:8080"
     environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models
       - OLLAMA_BASE_URLS=http://host.docker.internal:11434 #comma separated ollama hosts
       - ENV=dev
       - WEBUI_AUTH=False
-#      - WEBUI_NAME=Kickstart AI
+      #      - WEBUI_NAME=Kickstart AI
       - WEBUI_URL=http://localhost:8080
       - WEBUI_SECRET_KEY=t0p-s3cr3t
+      - ENABLE_WEB_SEARCH=true
+      - WEB_SEARCH_ENGINE=google
     extra_hosts:
       - host.docker.internal:host-gateway
     restart: unless-stopped
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Open WebUI
+      - homepage.icon=open-webui.png
+      - homepage.href=http://localhost:8080/
+      - homepage.description=Web UI for LLMs
+      - homepage.weight=1
 
   # use local llama instead on MacOS, container does not have GPU support for Metal
   ollama-cpu:

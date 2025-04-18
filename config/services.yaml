@@ -3,25 +3,10 @@
 # https://gethomepage.dev/configs/services/
 
 - Tools:
-    - n8n:
-        icon: n8n.png
-        href: "http://localhost:5678/"
-        description: build workflows, connect everything
-#        widget:
-#          type: customapi
-#          url: http://host.docker.internal:5678/webhook/homepage-widget
-#          method: GET
-#          mappings:
-#            - field: 0.sum_count_workflows
-#              label: workflows
-#              format: number
-#            - field: 0.sum_count_executions
-#              label: executions
-#              format: number
-    - open-webui:
-        icon: open-webui.png
-        href: "http://localhost:8080/"
-        description: Ollama Web UI
+    - ChatGPT:
+        icon: chatgpt.png
+        href: "https://chat.openai.com/"
+        description: ChatGPT
 
 - APIs:
     - ollama:

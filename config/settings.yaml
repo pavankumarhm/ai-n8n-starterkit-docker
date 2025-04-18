@@ -5,3 +5,24 @@
 #providers:
 #  openweathermap: openweathermapapikey
 #  weatherapi: weatherapiapikey
+
+layout:
+  Tools:
+  APIs:
+  Host:
+    style: row
+    columns: 3
+    useEqualHeights: true
+
+quicklaunch:
+  searchDescriptions: true
+#  hideInternetSearch: true
+#  showSearchSuggestions: true
+#  hideVisitURL: true
+  provider: google
+
+headerStyle: clean
+#showStats: true
+hideVersion: true
+disableUpdateCheck: true
+target: _self
