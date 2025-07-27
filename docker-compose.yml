@@ -3,57 +3,60 @@ volumes:
   postgres_storage:
   ollama_storage:
   webui_storage:
+  qdrant_storage:
 
 x-n8n: &service-n8n
   image: n8nio/n8n:latest
   env_file:
     - .env
 
-x-ollama: &service-ollama
-  image: ollama/ollama:latest
-  ports:
-    - "11434:11434"
-  volumes:
-    - ollama_storage:/root/.ollama
-  container_name: ollama
-  pull_policy: always
-  tty: true
-  restart: always
-  environment:
-    - OLLAMA_KEEP_ALIVE=24h
-    - OLLAMA_HOST=0.0.0.0
+# x-ollama: &service-ollama
+#   image: ollama/ollama:latest
+#   ports:
+#     - "11434:11434"
+#   volumes:
+#     - ollama_storage:/root/.ollama
+#   container_name: ollama
+#   pull_policy: always
+#   tty: true
+#   restart: always
+#   environment:
+#     - OLLAMA_KEEP_ALIVE=24h
+#     - OLLAMA_HOST=0.0.0.0
 
-x-init-ollama: &init-ollama
-  image: ollama/ollama:latest
-  container_name: ollama-pull-llama
-  volumes:
-    - ollama_storage:/root/.ollama
-  entrypoint: /bin/sh
-  environment:
-    - OLLAMA_HOST=ollama:11434
-  command:
-    - "-c"
-    - "sleep 3; ollama pull llama3.2:3b"
+# x-init-ollama: &init-ollama
+#   image: ollama/ollama:latest
+#   container_name: ollama-pull-llama
+#   volumes:
+#     - ollama_storage:/root/.ollama
+#   entrypoint: /bin/sh
+#   environment:
+#     - OLLAMA_HOST=ollama:11434
+#   command:
+#     - "-c"
+#     - "sleep 3; ollama pull llama3.2:3b"
 
 services:
-  # allows displaying the container status in homepage
-  dockerproxy:
-    image: ghcr.io/tecnativa/docker-socket-proxy:latest
-    container_name: dockerproxy
-    environment:
-      - CONTAINERS=1 # Allow access to viewing containers
-      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
-      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
-      - POST=0 # Disallow any POST operations (effectively read-only)
-    ports:
-      - "127.0.0.1:2375:2375"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
-    restart: unless-stopped
+#   # allows displaying the container status in homepage
+#   dockerproxy:
+#     image: ghcr.io/tecnativa/docker-socket-proxy:latest
+#     container_name: dockerproxy
+#     environment:
+#       - CONTAINERS=1 # Allow access to viewing containers
+#       - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
+#       - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+#       - POST=0 # Disallow any POST operations (effectively read-only)
+#     ports:
+#       - "127.0.0.1:2375:2375"
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
+#     restart: unless-stopped
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    env_file:
+      - .env
     environment:
       # HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
       PUID: 1000 # optional, your user id
@@ -114,6 +117,7 @@ services:
         condition: service_healthy
       n8n-import:
         condition: service_completed_successfully
+
     healthcheck:
       test: [ "CMD-SHELL", "wget -qS --proxy=off --tries=1 --timeout=3 -O /dev/null http://127.0.0.1:5678/healthz 2>&1 | grep -q 'HTTP/1.1 200 OK'" ]
       interval: 20s
@@ -133,9 +137,18 @@ services:
 #      - homepage.widget.mappings[0].field=0.sum_count_workflows
 #      - homepage.widget.mappings[0].format=number
 #      - homepage.weight=2
+  qdrant:
+    image: qdrant/qdrant
+    hostname: qdrant
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - 6333:6333
+    volumes:
+      - qdrant_storage:/qdrant/storage
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
     container_name: open-webui
     volumes:
       - webui_storage:/app/backend/data
@@ -164,44 +177,44 @@ services:
       - homepage.weight=1
 
   # use local llama instead on MacOS, container does not have GPU support for Metal
-  ollama-cpu:
-    profiles: [ "cpu" ]
-    <<: *service-ollama
+  # ollama-cpu:
+  #   profiles: [ "cpu" ]
+  #   <<: *service-ollama
 
-  ollama-gpu:
-    profiles: [ "gpu-nvidia" ]
-    <<: *service-ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
+  # ollama-gpu:
+  #   profiles: [ "gpu-nvidia" ]
+  #   <<: *service-ollama
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [ gpu ]
 
-  ollama-gpu-amd:
-    profiles: [ "gpu-amd" ]
-    <<: *service-ollama
-    image: ollama/ollama:rocm
-    devices:
-      - "/dev/kfd"
-      - "/dev/dri"
+  # ollama-gpu-amd:
+  #   profiles: [ "gpu-amd" ]
+  #   <<: *service-ollama
+  #   image: ollama/ollama:rocm
+  #   devices:
+  #     - "/dev/kfd"
+  #     - "/dev/dri"
 
-  ollama-pull-llama-cpu:
-    profiles: [ "cpu" ]
-    <<: *init-ollama
-    depends_on:
-      - ollama-cpu
+  # ollama-pull-llama-cpu:
+  #   profiles: [ "cpu" ]
+  #   <<: *init-ollama
+  #   depends_on:
+  #     - ollama-cpu
 
-  ollama-pull-llama-gpu:
-    profiles: [ "gpu-nvidia" ]
-    <<: *init-ollama
-    depends_on:
-      - ollama-gpu
+  # ollama-pull-llama-gpu:
+  #   profiles: [ "gpu-nvidia" ]
+  #   <<: *init-ollama
+  #   depends_on:
+  #     - ollama-gpu
 
-  ollama-pull-llama-gpu-amd:
-    profiles: [ gpu-amd ]
-    <<: *init-ollama
-    image: ollama/ollama:rocm
-    depends_on:
-      - ollama-gpu-amd
+  # ollama-pull-llama-gpu-amd:
+  #   profiles: [ gpu-amd ]
+  #   <<: *init-ollama
+  #   image: ollama/ollama:rocm
+  #   depends_on:
+  #     - ollama-gpu-amd

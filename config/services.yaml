@@ -2,11 +2,56 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
+
+
+- Self-hosted:
+    - Open WebUI:
+        icon: open-webui.png
+        href: "http://localhost:8080/"
+        description: Web UI for LLMs
+    - n8n:
+        icon: n8n.png
+        href: "http://localhost:5678/"
+        description: Workflow automation
+        widgets:
+          - type: customapi
+            url: http://host.docker.internal:5678/api/v1/workflows
+            method: GET
+            headers:
+              X-N8N-API-KEY: "{{HOMEPAGE_VAR_N8N_API_KEY}}"
+            mappings:
+              - field: data
+                label: workflows
+                format: size
+          - type: customapi
+            url: http://host.docker.internal:5678/api/v1/executions
+            method: GET
+            headers:
+              X-N8N-API-KEY: "{{HOMEPAGE_VAR_N8N_API_KEY}}"
+            mappings:
+              - field: data
+                label: executions
+                format: size
+        
+
 - Tools:
     - ChatGPT:
         icon: chatgpt.png
         href: "https://chat.openai.com/"
         description: ChatGPT
+    - Perplexity:
+        icon: perplexity.svg
+        href: "https://www.perplexity.ai/"
+        description: Perplexity AI
+    - Claude:
+        icon: claude.svg
+        href: "https://claude.ai/"
+        description: Anthropic Claude
+    - Ollama Models:
+        icon: ollama.png
+        href: "https://ollama.com/library"
+        description: Download Ollama models
+
 
 - APIs:
     - ollama:
