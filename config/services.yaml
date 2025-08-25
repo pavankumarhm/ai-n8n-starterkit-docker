@@ -32,6 +32,10 @@
               - field: data
                 label: executions
                 format: size
+    - ComfyUI:
+        icon: https://raw.githubusercontent.com/comfyanonymous/ComfyUI/master/web/favicon.ico
+        href: "http://localhost:8188/"
+        description: Stable Diffusion GUI
         
 
 - Tools:

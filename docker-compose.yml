@@ -4,6 +4,7 @@ volumes:
   ollama_storage:
   webui_storage:
   qdrant_storage:
+  comfyui_storage:
 
 x-n8n: &service-n8n
   image: n8nio/n8n:latest
@@ -175,6 +176,34 @@ services:
       - homepage.href=http://localhost:8080/
       - homepage.description=Web UI for LLMs
       - homepage.weight=1
+
+  comfyui:
+    build:
+      context: ./comfyui-docker
+      dockerfile: Dockerfile
+    container_name: comfyui
+    restart: unless-stopped
+    ports:
+      - "8188:8188"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    runtime: nvidia
+    labels:
+      - homepage.group=Tools
+      - homepage.name=ComfyUI
+      - homepage.icon=https://raw.githubusercontent.com/comfyanonymous/ComfyUI/master/web/favicon.ico
+      - homepage.href=http://localhost:8188/
+      - homepage.description=Powerful and modular stable diffusion GUI
+      - homepage.weight=3
 
   # use local llama instead on MacOS, container does not have GPU support for Metal
   # ollama-cpu:
